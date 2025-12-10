@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 // Importe tes écrans (assure-toi qu'ils existent dans le dossier screens/)
 import MapScreen from './screens/MapScreen';
-import CreatePostScreen from './screens/CreatePostScreen';
+import CreatePostScreen from './screens/screens/CreatePostScreen';
 import ProfileScreen from './screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
