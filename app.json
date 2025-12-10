@@ -38,10 +38,6 @@
     "plugins": [
       "expo-location"
     ],
-    "extra": {
-      "eas": {
-        "projectId": "f765361e-4e2b-4157-803e-e14d45e6b090"
-      }
-    }
+
   }
 }
