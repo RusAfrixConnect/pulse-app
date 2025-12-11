@@ -7,8 +7,8 @@ import { StatusBar, LogBox, View, ActivityIndicator } from 'react-native';
 
 // Importe tes écrans
 import MapScreen from './screens/MapScreen';
-import CreatePostScreen from './screens/CreatePostScreen'; // Chemin corrigé
-import ProfileScreen from './screens/ProfileScreen';
+import CreatePostScreen from './screens/screens/CreatePostScreen'; // Chemin corrigé
+import ProfileScreen from './screens/screens/screens/ProfileScreen'; //
 import HomeScreen from './screens/HomeScreen'; // Ajout pour voir les annonces en liste
 
 // Firebase config (pour vérifier la connexion)
