@@ -11,9 +11,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { db } from '../../../firebaseConfig'; ⬅️ IMPORT FIREBASE
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import * as Location from 'expo-location'; // ⬅️ IMPORT LOCATION
+import { db } from '../../../firebaseConfig'; // IMPORT FIREBASE
+import { collection, addDoc, serverTimestamp, GeoPoint } from 'firebase/firestore'; // Ajout de GeoPoint ici
+import * as Location from 'expo-location'; // IMPORT LOCATION
 
 export default function CreatePostScreen() {
   const [title, setTitle] = useState('');
@@ -56,13 +56,10 @@ export default function CreatePostScreen() {
         title: title.trim(),
         description: description.trim(),
         category: category,
-        // IMPORTANT: Pour Firebase, utilisez cette structure pour GeoPoint
-        location: {
-          latitude: userLocation.coords.latitude,
-          longitude: userLocation.coords.longitude,
-        },
-        userId: 'user_anonyme', // ⬅️ TEMPORAIRE, on remplacera plus tard par le vrai user
-        userName: 'Anonyme', // ⬅️ Nom temporaire
+        // CORRECTION : Utilisation de GeoPoint pour la localisation
+        location: new GeoPoint(userLocation.coords.latitude, userLocation.coords.longitude),
+        userId: 'user_anonyme', // TEMPORAIRE, on remplacera plus tard par le vrai user
+        userName: 'Anonyme', // Nom temporaire
         createdAt: serverTimestamp(), // Horodatage automatique du serveur
         likes: 0,
         comments: 0,
