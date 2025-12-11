@@ -123,41 +123,38 @@ export default function CreatePostScreen() {
         />
       </View>
 
-      <View style={styles.formGroup}>
-        <Text style={styles.label}>Catégorie</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={category}
-            onValueChange={(itemValue) => {
-              setCategory(itemValue);
-              if (itemValue !== 'vente' && itemValue !== 'services' && itemValue !== 'travail') {
-                setPrice('');
-              }
-            }}
-            style={styles.picker}
-            dropdownIconColor="#FFF"
-          >
-            <Picker.Item label="🛍️ Vente" value="vente" />
-            <Picker.Item label="🔧 Spécialistes / Services" value="services" />
-            <Picker.Item label="❤️ Rencontre" value="rencontre" />
-            <Picker.Item label="💼 Travail / Emploi" value="travail" />
-            <Picker.Item label="🎉 Activités / Événements" value="activites" />
-          </Picker>
-        </View>
-      </View>
-
-      {(category === 'vente' || category === 'services' || category === 'travail') && (
-        <View style={styles.formGroup}>
-          <Text style={styles.label}>Prix (€) {category === 'travail' ? '(Salaire)' : ''}</Text>
-          <TextInput
-            style={styles.input}
-            placeholder={category === 'travail' ? "Ex: 2500" : "Ex: 50"}
-            placeholderTextColor="#666"
-            value={price}
-            onChangeText={setPrice}
-            keyboardType="numeric"
-          />
-        </View>
+ <View style={styles.formGroup}>
+  <Text style={styles.label}>Catégorie *</Text>
+  <View style={styles.categoriesContainer}>
+    {[
+      { label: '🛍️ Vente', value: 'vente', color: '#34C759' },
+      { label: '🔧 Services', value: 'services', color: '#007AFF' },
+      { label: '❤️ Rencontre', value: 'rencontre', color: '#FF2D55' },
+      { label: '💼 Emploi', value: 'travail', color: '#5856D6' },
+      { label: '🎉 Activités', value: 'activites', color: '#FF9500' },
+    ].map((cat) => (
+      <TouchableOpacity
+        key={cat.value}
+        style={[
+          styles.categoryButton,
+          { backgroundColor: category === cat.value ? cat.color : '#1A1A1A' },
+          { borderColor: cat.color }
+        ]}
+        onPress={() => setCategory(cat.value)}
+      >
+        <Text style={[
+          styles.categoryButtonText,
+          { color: category === cat.value ? '#FFF' : cat.color }
+        ]}>
+          {cat.label}
+        </Text>
+      </TouchableOpacity>
+    ))}
+  </View>
+  <Text style={styles.selectedCategoryText}>
+    Sélectionné : {category}
+  </Text>
+</View>
       )}
 
       <View style={styles.formGroup}>
@@ -194,6 +191,33 @@ export default function CreatePostScreen() {
 }
 
 const styles = StyleSheet.create({
+  categoriesContainer: {
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  justifyContent: 'space-between',
+  marginTop: 5,
+},
+categoryButton: {
+  width: '48%', // Deux boutons par ligne
+  paddingVertical: 12,
+  paddingHorizontal: 10,
+  borderRadius: 10,
+  borderWidth: 2,
+  marginBottom: 10,
+  alignItems: 'center',
+},
+categoryButtonText: {
+  fontSize: 14,
+  fontWeight: '600',
+  textAlign: 'center',
+},
+selectedCategoryText: {
+  color: '#FF375F',
+  fontSize: 12,
+  marginTop: 8,
+  textAlign: 'center',
+  fontStyle: 'italic',
+},
   container: { flex: 1, backgroundColor: '#000', padding: 20 },
   header: {
     fontSize: 24,
