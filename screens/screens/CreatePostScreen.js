@@ -1,4 +1,4 @@
-// screens/CreatePostScreen.js - Écran pour créer une annonce
+// screens/screens/CreatePostScreen.js - Écran pour créer une annonce
 import React, { useState } from 'react';
 import {
   StyleSheet,
@@ -12,13 +12,14 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { db } from '../../firebaseConfig'; // IMPORT FIREBASE
-import { collection, addDoc, serverTimestamp, GeoPoint } from 'firebase/firestore'; // Ajout de GeoPoint ici
-import * as Location from 'expo-location'; // IMPORT LOCATION
+import { collection, addDoc, serverTimestamp, GeoPoint } from 'firebase/firestore';
+import * as Location from 'expo-location';
 
 export default function CreatePostScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('sortie');
+  const [category, setCategory] = useState('vente'); // Catégorie par défaut
+  const [price, setPrice] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -51,33 +52,40 @@ export default function CreatePostScreen() {
         lng: userLocation.coords.longitude,
       });
 
-      // 3. Envoie les données à la collection "posts" dans Firestore
-      const docRef = await addDoc(collection(db, 'posts'), {
+      // 3. Préparer les données pour Firestore
+      const postData = {
         title: title.trim(),
         description: description.trim(),
         category: category,
-        // CORRECTION : Utilisation de GeoPoint pour la localisation
-        location: new GeoPoint(userLocation.coords.latitude, userLocation.coords.longitude),
-        userId: 'user_anonyme', // TEMPORAIRE, on remplacera plus tard par le vrai user
-        userName: 'Anonyme', // Nom temporaire
-        createdAt: serverTimestamp(), // Horodatage automatique du serveur
+        location: new GeoPoint(userLocation.coords.latitude, userLocation.coords.longitude), // ✅ GeoPoint correct
+        userId: 'user_anonyme',
+        userName: 'Anonyme',
+        createdAt: serverTimestamp(),
         likes: 0,
         comments: 0,
-        type: 'post', // Pour identifier le type de document
-        status: 'active', // active, expired, deleted
-      });
+        status: 'active',
+      };
+
+      // 4. Ajouter un prix uniquement pour les catégories pertinentes
+      if (category === 'vente' || category === 'services' || category === 'travail') {
+        postData.price = price ? Number(price) : 0;
+      }
+
+      // 5. Envoie les données à Firestore
+      const docRef = await addDoc(collection(db, 'posts'), postData);
 
       console.log('✅ Annonce publiée ! ID : ', docRef.id);
       Alert.alert(
         'Super !',
         `Annonce "${title}" publiée sur la carte Pulse !`,
-        [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+        [{ text: 'OK' }]
       );
 
-      // 4. Réinitialise le formulaire
+      // 6. Réinitialise le formulaire
       setTitle('');
       setDescription('');
-      setCategory('sortie');
+      setCategory('vente');
+      setPrice('');
 
     } catch (error) {
       console.error('❌ Erreur Firestore : ', error);
@@ -107,7 +115,7 @@ export default function CreatePostScreen() {
         <Text style={styles.label}>Titre *</Text>
         <TextInput
           style={styles.input}
-          placeholder="Ex: Recherche joueur de foot"
+          placeholder="Ex: Vends guitare électrique, Recherche coéquipier..."
           placeholderTextColor="#666"
           value={title}
           onChangeText={setTitle}
@@ -120,24 +128,43 @@ export default function CreatePostScreen() {
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={category}
-            onValueChange={(itemValue) => setCategory(itemValue)}
+            onValueChange={(itemValue) => {
+              setCategory(itemValue);
+              if (itemValue !== 'vente' && itemValue !== 'services' && itemValue !== 'travail') {
+                setPrice('');
+              }
+            }}
             style={styles.picker}
             dropdownIconColor="#FFF"
           >
-            <Picker.Item label="🎉 Sortie / Activité" value="sortie" />
-            <Picker.Item label="💼 Travail / Job" value="travail" />
+            <Picker.Item label="🛍️ Vente" value="vente" />
+            <Picker.Item label="🔧 Spécialistes / Services" value="services" />
             <Picker.Item label="❤️ Rencontre" value="rencontre" />
-            <Picker.Item label="🛠️ Service / Entraide" value="service" />
-            <Picker.Item label="📣 Autre" value="autre" />
+            <Picker.Item label="💼 Travail / Emploi" value="travail" />
+            <Picker.Item label="🎉 Activités / Événements" value="activites" />
           </Picker>
         </View>
       </View>
+
+      {(category === 'vente' || category === 'services' || category === 'travail') && (
+        <View style={styles.formGroup}>
+          <Text style={styles.label}>Prix (€) {category === 'travail' ? '(Salaire)' : ''}</Text>
+          <TextInput
+            style={styles.input}
+            placeholder={category === 'travail' ? "Ex: 2500" : "Ex: 50"}
+            placeholderTextColor="#666"
+            value={price}
+            onChangeText={setPrice}
+            keyboardType="numeric"
+          />
+        </View>
+      )}
 
       <View style={styles.formGroup}>
         <Text style={styles.label}>Description *</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
-          placeholder="Décris en détails, donne le lieu, l'horaire..."
+          placeholder="Décris en détails, donne le lieu, l'horaire, les spécifications..."
           placeholderTextColor="#666"
           value={description}
           onChangeText={setDescription}
@@ -161,11 +188,6 @@ export default function CreatePostScreen() {
 
       <Text style={styles.note}>
         * Votre position actuelle sera automatiquement ajoutée à l'annonce.
-      </Text>
-      
-      <Text style={styles.info}>
-        🔍 Vérifiez que votre console Firebase a les bonnes règles :
-        {'\n'}allow read, write: if true;
       </Text>
     </ScrollView>
   );
@@ -219,16 +241,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     fontStyle: 'italic',
-  },
-  info: {
-    color: '#4A90E2',
-    fontSize: 12,
-    textAlign: 'center',
-    marginTop: 15,
-    padding: 10,
-    backgroundColor: '#1A1A1A',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#333',
   },
 });
