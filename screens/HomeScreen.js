@@ -9,7 +9,7 @@ import {
   RefreshControl,
   ActivityIndicator
 } from 'react-native';
-import { db } from '../config/firebaseConfig';
+import { db } from '../firebaseConfig';
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 
 const HomeScreen = () => {
