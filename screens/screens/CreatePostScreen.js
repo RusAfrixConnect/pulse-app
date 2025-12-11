@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { db } from '../firebaseConfig'; // ⬅️ IMPORT FIREBASE
+import { db } from '../../../firebaseConfig'; ⬅️ IMPORT FIREBASE
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import * as Location from 'expo-location'; // ⬅️ IMPORT LOCATION
 
