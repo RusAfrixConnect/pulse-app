@@ -10,7 +10,7 @@ import {
   ActivityIndicator 
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { db } from '../../firebaseConfig';
+import { db } from '../firebaseConfig';
 import { collection, onSnapshot } from 'firebase/firestore';
 
 export default function MapScreen() {
