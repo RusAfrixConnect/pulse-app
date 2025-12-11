@@ -1,23 +1,19 @@
-// App.js - CODE DE TEST (sans react-native-screens)
+// App.js - VERSION FINALE POUR PULSE
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import { StatusBar, View, Text } from 'react-native';
+import { StatusBar, LogBox, View } from 'react-native';
 
-// Import SIMPLIFIÉ des écrans (assure-toi que ces chemins sont bons)
-import HomeScreen from './screens/HomeScreen';
+// Import de tes écrans (VERIFIE CES CHEMINS !)
 import MapScreen from './screens/MapScreen';
 import CreatePostScreen from './screens/screens/CreatePostScreen';
 import ProfileScreen from './screens/screens/screens/ProfileScreen';
+import HomeScreen from './screens/HomeScreen';
+
+LogBox.ignoreLogs(['Non-serializable values were found in the navigation state']);
 
 const Tab = createBottomTabNavigator();
-
-// Écrans factices pour tester (on utilisera les tiens après)
-function TempHomeScreen() { return <View style={{flex:1, justifyContent:'center', alignItems:'center', backgroundColor:'#000'}}><Text style={{color:'#FFF'}}>Feed Pulse (Test)</Text></View>;}
-function TempMapScreen() { return <View style={{flex:1, justifyContent:'center', alignItems:'center', backgroundColor:'#000'}}><Text style={{color:'#FFF'}}>Carte (Test)</Text></View>;}
-function TempCreateScreen() { return <View style={{flex:1, justifyContent:'center', alignItems:'center', backgroundColor:'#000'}}><Text style={{color:'#FFF'}}>Poster (Test)</Text></View>;}
-function TempProfileScreen() { return <View style={{flex:1, justifyContent:'center', alignItems:'center', backgroundColor:'#000'}}><Text style={{color:'#FFF'}}>Profil (Test)</Text></View>;}
 
 export default function App() {
   return (
@@ -25,13 +21,17 @@ export default function App() {
       <StatusBar barStyle="light-content" backgroundColor="#0A0A0A" />
       <NavigationContainer>
         <Tab.Navigator
+          initialRouteName="Feed"
           screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
-              if (route.name === 'Feed') iconName = focused ? 'home' : 'home-outline';
-              if (route.name === 'Carte') iconName = focused ? 'map' : 'map-outline';
-              if (route.name === 'Poster') iconName = focused ? 'add-circle' : 'add-circle-outline';
-              if (route.name === 'Profil') iconName = focused ? 'person' : 'person-outline';
+              switch (route.name) {
+                case 'Carte': iconName = focused ? 'map' : 'map-outline'; break;
+                case 'Feed': iconName = focused ? 'home' : 'home-outline'; break;
+                case 'Poster': iconName = focused ? 'add-circle' : 'add-circle-outline'; break;
+                case 'Profil': iconName = focused ? 'person' : 'person-outline'; break;
+                default: iconName = 'help-outline';
+              }
               return <Ionicons name={iconName} size={size} color={color} />;
             },
             tabBarActiveTintColor: '#FF375F',
@@ -50,10 +50,10 @@ export default function App() {
             headerTitleAlign: 'center',
           })}
         >
-          <Tab.Screen name="Feed" component={TempHomeScreen} options={{ title: 'Feed Pulse' }} />
-          <Tab.Screen name="Carte" component={TempMapScreen} options={{ title: 'Carte Pulse' }} />
-          <Tab.Screen name="Poster" component={TempCreateScreen} options={{ title: 'Créer une annonce' }} />
-          <Tab.Screen name="Profil" component={TempProfileScreen} options={{ title: 'Mon Profil' }} />
+          <Tab.Screen name="Feed" component={HomeScreen} options={{ title: 'Feed Pulse' }} />
+          <Tab.Screen name="Carte" component={MapScreen} options={{ title: 'Carte Pulse' }} />
+          <Tab.Screen name="Poster" component={CreatePostScreen} options={{ title: 'Créer une annonce' }} />
+          <Tab.Screen name="Profil" component={ProfileScreen} options={{ title: 'Mon Profil' }} />
         </Tab.Navigator>
       </NavigationContainer>
     </>
